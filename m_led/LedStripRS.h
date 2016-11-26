@@ -1,5 +1,5 @@
-#ifndef LedStripRS
-#define LedStripRS
+#ifndef LedStripRS_H
+#define LedStripRS_H
 
 #include <avr/pgmspace.h>
 // ******** DEBUG ==== should auto config to adapt different mother board *********
@@ -17,11 +17,77 @@
 #define NOP8 NOP4 NOP4
 #define NOP16 NOP8 NOP8
 
+#define LSPA 2
+#define LSPB 1
+#define LSPD 0
+
+
+template<int cs, int spin>
+struct _static_pin_part2
+{
+	static void set();
+	static void clear();
+};
+
+template<int spin>
+struct _static_pin_part2<LSPD,spin>
+{
+	static void set()
+	{
+		PORTD |= (0x1 << spin);
+	}
+	static void clear()
+	{
+		PORTD &= ~(0x1 << spin);
+	}
+};
+
+
+template<int spin>
+struct _static_pin_part2<LSPB,spin>
+{
+	static void set()
+	{
+		PORTB |= (0x1 << (spin-8));
+	}
+	static void clear()
+	{
+		PORTB &= ~(0x1 << (spin-8));
+	}
+};
+
+template<int spin>
+struct _static_pin_part2<LSPA,spin>
+{
+	static void set()
+	{
+		PORTB |= (0x1 << (spin-14));
+	}
+	static void clear()
+	{
+		PORTB &= ~(0x1 << (spin-14));
+	}
+};
+
+
+template<int spin>
+struct _static_pin
+{
+	typedef _static_pin_part2<(spin < 8) ? ( LSPD ) : ( (spin < 14) ? LSPB : LSPA ),spin> _part2;
+	static void set()
+	{
+		_part2::set();
+	}
+	static void clear()
+	{
+		_part2::clear();
+	} 
+};
+
+template<int spin,int length=10>
 class LedStripRS
 {
 private:
-	int pin;
-	int length;
 	void send_single(uint32_t data)
 	{
 		int i;
@@ -34,7 +100,7 @@ private:
 			{
 				//digitalWrite(pin,HIGH);
 				DATA_1;				
-				__asm__(NOP16 NOP2 NOP4 NOP2);
+				__asm__(NOP16 NOP8);
 				//digitalWrite(pin,LOW);
 				DATA_0;
 			}
@@ -56,15 +122,9 @@ private:
 public:
 	LedStripRS()
 	{}
-	void setup(int ipin,int ilength)
+	void setup()
 	{
-		pin=ipin;
-		length=ilength;
-		pinMode(pin, OUTPUT);      // sets the digital pin as output	
-	}
-	void setup(int ipin)
-	{
-		setup(ipin,10);
+		pinMode(spin, OUTPUT);      // sets the digital pin as output	
 	}
 	void send_pattern(const uint32_t data[])
 	{
@@ -89,7 +149,7 @@ public:
 	}
 	void reset_strip()
 	{
-	  DATA_0;
+	  _static_pin<spin>::clear();
 	  delayMicroseconds(20);
 	}
 };
