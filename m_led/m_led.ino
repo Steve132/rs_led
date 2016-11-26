@@ -2,17 +2,33 @@
   
 LedStripRS<A0> trs;
 
+static BaseLedStripRS* strips[]=
+{
+	&trs
+};
+
+static const int num_strips=sizeof(strips)/sizeof(strips[0]);
+
 void setup() 
 {              
-	trs.setup();
-	trs.reset_strip();        // resets each of the LED nodes to OFF 
+	for(int i=0;i<num_strips;i++)
+	{
+		strips[i]->setup();
+	}
+}
+
+void send_color_all(uint32_t color)
+{
+	for(int i=0;i<num_strips;i++)
+	{
+		strips[i]->send_color(color);
+	}
 }
 
 void loop()
 {
-	//send_1M_pattern(pattern_test_red, 10, 500);
-	trs.send_color(0x0000FF);
+	send_color_all(0x0000FF);
 	delay(1000);
-	trs.send_color(0x00FF00);
+	send_color_all(0x00FF00);
 	delay(1000);
 }

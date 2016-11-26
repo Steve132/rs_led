@@ -84,8 +84,17 @@ struct _static_pin
 	} 
 };
 
+class BaseLedStripRS
+{
+public:
+	virtual void send_color(uint32_t c);
+	virtual void send_pattern(const uint32_t data[]);
+	virtual void setup();
+	virtual void reset();
+};
+
 template<int spin,int length=10>
-class LedStripRS
+class LedStripRS: public BaseLedStripRS
 {
 private:
 	void send_single(uint32_t data)
@@ -124,7 +133,8 @@ public:
 	{}
 	void setup()
 	{
-		pinMode(spin, OUTPUT);      // sets the digital pin as output	
+		pinMode(spin, OUTPUT);      // sets the digital pin as output
+		reset();
 	}
 	void send_pattern(const uint32_t data[])
 	{
@@ -147,7 +157,7 @@ public:
 		}
 		interrupts(); // Turn ON Interrupts after data is sent
 	}
-	void reset_strip()
+	void reset()
 	{
 	  _static_pin<spin>::clear();
 	  delayMicroseconds(20);
