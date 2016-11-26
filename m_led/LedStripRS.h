@@ -17,7 +17,7 @@
 #define NOP8 NOP4 NOP4
 #define NOP16 NOP8 NOP8
 
-#define LSPA 2
+#define LSPC 2
 #define LSPB 1
 #define LSPD 0
 
@@ -25,18 +25,18 @@
 template<int cs, int spin>
 struct _static_pin_part2
 {
-	static void set();
-	static void clear();
+	inline static void set() __attribute__((always_inline));
+	inline static void clear() __attribute__((always_inline));
 };
 
 template<int spin>
 struct _static_pin_part2<LSPD,spin>
 {
-	static void set()
+	inline static void set() __attribute__((always_inline))
 	{
 		PORTD |= (0x1 << spin);
 	}
-	static void clear()
+	inline static void clear() __attribute__((always_inline))
 	{
 		PORTD &= ~(0x1 << spin);
 	}
@@ -46,26 +46,26 @@ struct _static_pin_part2<LSPD,spin>
 template<int spin>
 struct _static_pin_part2<LSPB,spin>
 {
-	static void set()
+	inline static void set() __attribute__((always_inline))
 	{
 		PORTB |= (0x1 << (spin-8));
 	}
-	static void clear()
+	inline static void clear() __attribute__((always_inline))
 	{
 		PORTB &= ~(0x1 << (spin-8));
 	}
 };
 
 template<int spin>
-struct _static_pin_part2<LSPA,spin>
+struct _static_pin_part2<LSPC,spin>
 {
-	static void set()
+	inline static void set() __attribute__((always_inline))
 	{
-		PORTB |= (0x1 << (spin-14));
+		PORTC |= (0x1 << (spin-14));
 	}
-	static void clear()
+	inline static void clear() __attribute__((always_inline))
 	{
-		PORTB &= ~(0x1 << (spin-14));
+		PORTC  &= ~(0x1 << (spin-14));
 	}
 };
 
@@ -73,12 +73,12 @@ struct _static_pin_part2<LSPA,spin>
 template<int spin>
 struct _static_pin
 {
-	typedef _static_pin_part2<(spin < 8) ? ( LSPD ) : ( (spin < 14) ? LSPB : LSPA ),spin> _part2;
-	static void set()
+	typedef _static_pin_part2<(spin < 8) ? ( LSPD ) : ( (spin < 14) ? LSPB : LSPC ),spin> _part2;
+	inline static void set() __attribute__((always_inline))
 	{
 		_part2::set();
 	}
-	static void clear()
+	inline static void clear() __attribute__((always_inline))
 	{
 		_part2::clear();
 	} 
@@ -99,18 +99,18 @@ private:
 			if (data & j)
 			{
 				//digitalWrite(pin,HIGH);
-				DATA_1;				
+				_static_pin<spin>::set();				
 				__asm__(NOP16 NOP8);
 				//digitalWrite(pin,LOW);
-				DATA_0;
+				_static_pin<spin>::clear();
 			}
 			else
 			{
 				//digitalWrite(pin,HIGH);
-				DATA_1;
+				_static_pin<spin>::set();
 				__asm__(NOP8 NOP1); 
 				//digitalWrite(pin,LOW);
-				DATA_0;				
+				_static_pin<spin>::clear();
 				/*----------------------------*/    
 				__asm__(NOP2 NOP1);    
 				/*----------------------------*/      
@@ -153,7 +153,6 @@ public:
 	  delayMicroseconds(20);
 	}
 };
-
 
 
 #endif //LedStripRS
