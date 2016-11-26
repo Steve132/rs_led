@@ -17,30 +17,6 @@ void send_color_all(uint32_t color)
 	}
 }
 
-uint32_t brighten(uint32_t color,uint8_t brightness)
-{
-	uint32_t out=0;
-	uint32_t r;
-
-	r=color & 0xFF;
-	r*=brightness;
-	r>>=8;
-	out |= r;
-
-	r=(color >> 8) & 0xFF;
-	r*=brightness;
-	r>>=8;
-	out |= r << 8;
-
-	r=(color >> 16) & 0xFF;
-	r*=brightness;
-	r>>=8;
-	out |= r << 16;
-	return out;
-}
-
-
-
 #define RAINBOW_SLOWNESS 25
 PROGMEM static const prog_uint32_t patterns[]=
 {
@@ -68,16 +44,17 @@ PROGMEM static const prog_uint32_t patterns[]=
 
 static const int size_patterns=sizeof(patterns)/sizeof(patterns[0]);
 
-int iterate_pattern(int pptr,int pattern_frame_id,uint8_t brightness)
+int iterate_pattern(int pptr,int pattern_frame_id,uint8_t brightness,uint32_t speedup_factor)
 {
 	uint32_t len=pgm_read_dword_near(patterns+pptr);
 	
 	int pfidlu=pattern_frame_id << 1;
-	uint32_t slowness=pgm_read_dword_near(patterns+pptr+1+pfidlu);
+	uint32_t pslowness=pgm_read_dword_near(patterns+pptr+1+pfidlu);
 	uint32_t color=pgm_read_dword_near(patterns+pptr+2+pfidlu);
 	color=brighten(color,brightness);
 	send_color_all(color);
-	delay(slowness);
+	pslowness=speedup(pslowness,speedup_factor);
+	delay(pslowness);
 	pattern_frame_id++;
 	if(pattern_frame_id >= len)
 	{
@@ -100,7 +77,8 @@ int increment_pattern(int pptr)
 int pframeid=0;
 int initpattern=1;
 int curptr=0;
-uint8_t curbrightness=255;
+uint8_t curbrightness=255;	//brightness is X=curbrightness/255.  Max brightness is set here
+uint32_t curspeedup=1024; //Slowness factor is X=speedup/1024.  For example, set speedup to 2048 to get a 2x speedup.  set speedup to 512 to get a 50% slowdown.  
 
 void setup() 
 {              
@@ -115,5 +93,5 @@ void setup()
 }
 void loop()
 {	
-	pframeid=iterate_pattern(curptr,pframeid,curbrightness);
+	pframeid=iterate_pattern(curptr,pframeid,curbrightness,curspeedup);
 }
