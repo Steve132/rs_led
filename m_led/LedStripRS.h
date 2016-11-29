@@ -165,6 +165,6 @@ public:
 };
 
 uint32_t brighten(uint32_t color,uint8_t brightness);
-uint32_t speedup(uint32_t delay,uint32_t speedup);  //fixed-point, 10 bit fraction. 
+uint32_t slowdown(uint32_t delay,uint32_t sd);  //fixed-point, 10 bit fraction. 
 
 #endif //LedStripRS

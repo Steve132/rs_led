@@ -24,10 +24,10 @@ uint32_t brighten(uint32_t color,uint8_t brightness)
 	out |= r << 16;
 	return out;
 }
-uint32_t speedup(uint32_t delay,uint32_t speedup)  //fixed-point, 10 bit fraction. 
+uint32_t slowdown(uint32_t delay,uint32_t sd)  //fixed-point, 10 bit fraction. 
 {
 	uint32_t output=delay;
-	output*=speedup;
+	output*=sd;
 	output >>=10;
 	return output;
 }

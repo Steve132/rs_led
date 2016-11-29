@@ -44,7 +44,7 @@ PROGMEM static const uint32_t patterns[]=
 
 static const int size_patterns=sizeof(patterns)/sizeof(patterns[0]);
 
-int iterate_pattern(int pptr,int pattern_frame_id,uint8_t brightness,uint32_t speedup_factor)
+int iterate_pattern(int pptr,int pattern_frame_id,uint8_t brightness,uint32_t slowdown_factor)
 {
 	uint32_t len=pgm_read_dword_near(patterns+pptr);
 	
@@ -53,7 +53,7 @@ int iterate_pattern(int pptr,int pattern_frame_id,uint8_t brightness,uint32_t sp
 	uint32_t color=pgm_read_dword_near(patterns+pptr+2+pfidlu);
 	color=brighten(color,brightness);
 	send_color_all(color);
-	pslowness=speedup(pslowness,speedup_factor);
+	pslowness=slowdown(pslowness,slowdown_factor);
 	delay(pslowness);
 	pattern_frame_id++;
 	if(pattern_frame_id >= len)
@@ -88,7 +88,7 @@ void goto_pattern(int pattern_id)
 }
 
 uint8_t curbrightness=255;	//brightness is X=curbrightness/255.  Max brightness is set here
-uint32_t curspeedup=1024; //Slowness factor is X=speedup/1024.  For example, set speedup to 2048 to get a 2x speedup.  set speedup to 512 to get a 50% slowdown.  
+uint32_t curslowdown=1024; //Slowness factor is X=slowdown/1024.  For example, set slowdown to 2048 to get a 2x slowdown.  set slowdown to 512 to get a 50% slowdown (2x speedup).  
 
 void setup() 
 {              
@@ -100,5 +100,5 @@ void setup()
 }
 void loop()
 {	
-	pframeid=iterate_pattern(curptr,pframeid,curbrightness,curspeedup);
+	pframeid=iterate_pattern(curptr,pframeid,curbrightness,curslowdown);
 }
