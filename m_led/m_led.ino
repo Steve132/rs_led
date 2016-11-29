@@ -1,6 +1,6 @@
 #include "LedStripRS.h"
   
-LedStripRS<A0> trs;
+LedStripRS<A0,15> trs;
 
 static BaseLedStripRS* strips[]=
 {
