@@ -18,7 +18,7 @@ void send_color_all(uint32_t color)
 }
 
 #define RAINBOW_SLOWNESS 25
-PROGMEM static const prog_uint32_t patterns[]=
+PROGMEM static const uint32_t patterns[]=
 {
 	//4th of july
 	4,
