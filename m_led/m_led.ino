@@ -40,6 +40,11 @@ PROGMEM static const uint32_t patterns[]=
 	RAINBOW_SLOWNESS,0xff00ff,RAINBOW_SLOWNESS,0xea00ff,RAINBOW_SLOWNESS,0xd400ff,RAINBOW_SLOWNESS,0xbf00ff,RAINBOW_SLOWNESS,0xaa00ff,
 	RAINBOW_SLOWNESS,0x9500ff,RAINBOW_SLOWNESS,0x8000ff,RAINBOW_SLOWNESS,0x6a00ff,RAINBOW_SLOWNESS,0x5500ff,RAINBOW_SLOWNESS,0x4000ff,
 	RAINBOW_SLOWNESS,0x2b00ff,RAINBOW_SLOWNESS,0x1500ff
+  //dootdoot
+  22,
+  2000,0xFFFFFF,100,0xea00ff,2000,0xFFFFFF,100,0x00ff40,4000,0xFFFFFF,100,0x6a00ff,200,0xffaa00,400,0x00ff80,600,0x00ff6a,100,0xff0095,
+  100,0x0080ff,100,0xff0095,100,0x0080ff,100,0xff0095,100,0x0080ff,100,0xff0095,100,0x0080ff,500,0x002bff,500,0x8000ff,500,0x00ff15,
+  500,0xff002b,1000,0xbfff00
 };
 
 static const int size_patterns=sizeof(patterns)/sizeof(patterns[0]);
@@ -96,7 +101,7 @@ void setup()
 	{
 		strips[i]->setup();
 	}
-	goto_pattern(1);
+	goto_pattern(2);
 }
 void loop()
 {	
