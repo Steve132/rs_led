@@ -74,9 +74,19 @@ int increment_pattern(int pptr)
 	return pptr;
 }
 
+
 int pframeid=0;
-int initpattern=1;
 int curptr=0;
+void goto_pattern(int pattern_id)
+{
+	curptr=0;
+	pframeid=0;
+	for(int i=0;i<pattern_id;i++)
+	{
+		curptr=increment_pattern(curptr);
+	}
+}
+
 uint8_t curbrightness=255;	//brightness is X=curbrightness/255.  Max brightness is set here
 uint32_t curspeedup=1024; //Slowness factor is X=speedup/1024.  For example, set speedup to 2048 to get a 2x speedup.  set speedup to 512 to get a 50% slowdown.  
 
@@ -86,10 +96,7 @@ void setup()
 	{
 		strips[i]->setup();
 	}
-	for(int i=0;i<initpattern;i++)
-	{
-		curptr=increment_pattern(curptr);
-	}
+	goto_pattern(1);
 }
 void loop()
 {	
