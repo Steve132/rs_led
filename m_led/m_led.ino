@@ -96,6 +96,42 @@ void goto_pattern(int pattern_id)
 
 uint8_t curbrightness=255;	//brightness is X=curbrightness/255.  Max brightness is set here
 uint32_t curslowdown=1024; //Slowness factor is X=slowdown/1024.  For example, set slowdown to 2048 to get a 2x slowdown.  set slowdown to 512 to get a 50% slowdown (2x speedup).  
+uint8_t curpattern=2;
+
+#define BUTTON_MAX 4
+#define BUTTON_PUSHED 0
+
+#define UP_BUTTON 0
+#define DOWN_BUTTON 1
+
+int  buttonstates[]={BUTTON_MAX,BUTTON_MAX};
+int  buttonpins[]={2,3};
+
+static const int NUM_BUTTONS=sizeof(buttonstates)/sizeof(buttonstates[0]);
+
+void updatebuttons()
+{
+	for(int i=0;i<NUM_BUTTONS;i++)
+	{
+		int val=(digitalRead(buttonpins[i]) << 1) - 1;
+		buttonstates[i]+=val;
+		if(buttonstates[i]>=BUTTON_MAX)
+		{
+			buttonstates[i]=BUTTON_MAX;
+		}
+		else if(buttonstates[i] < 0)
+		{
+			buttonstates[i]=0;
+		}
+	}
+}
+void setupbuttons()
+{
+	for(int i=0;i<NUM_BUTTONS;i++)
+	{
+		pinMode(buttonpins[i], INPUT_PULLUP);
+	}
+}
 
 void setup() 
 {              
@@ -103,9 +139,21 @@ void setup()
 	{
 		strips[i]->setup();
 	}
-	goto_pattern(2);
+	setupbuttons();
+	goto_pattern(curpattern);
 }
 void loop()
 {	
 	pframeid=iterate_pattern(curptr,pframeid,curbrightness,curslowdown);
+	updatebuttons();
+	if(buttonstates[UP_BUTTON] == BUTTON_PUSHED)
+	{
+		curpattern++;
+		goto_pattern(curpattern);
+	}
+	else if(buttonstates[DOWN_BUTTON] == BUTTON_PUSHED)
+	{
+		curpattern--;
+		goto_pattern(curpattern);
+	}
 }
