@@ -1,10 +1,12 @@
 #include "LedStripRS.h"
   
-LedStripRS<A0,15> trs;
+LedStripRS<A0> stripA0;
+LedStripRS<A2> stripA2;
+LedStripRS<1>  strip1;
 
 static BaseLedStripRS* strips[]=
 {
-	&trs
+	&stripA0,&stripA2,&strip1
 };
 
 static const int num_strips=sizeof(strips)/sizeof(strips[0]);
